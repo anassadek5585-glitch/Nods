@@ -30,7 +30,7 @@ bot.on('message', (msg) => {
 
   if (text && text.toLowerCase().includes('/start')) {
     if (userLang.startsWith('ar')) {
-      bot.sendMessage(chatId, `🚀 أهلاً بك في منصة النمو الذكي (Worker #${WORKER_ID})!\n\nللاشتراك وتفعيل نظامك الفوري (200 دولار)، يرجى التحويل حصراً عبر شبكة:\n🔸 *BNB Smart Chain (BEP20)*\n\nمحفظتنا المعتمدة للاستلام:\n\`${MY_WALLET}\`\n\nبعد الدفع، أرسل رقم المعاملة (TXID) هنا وسيتم التفعيل أوتوماتيكياً!`);
+      bot.sendMessage(chatId, `🚀 أهلاً بك في منصة النمو الذكي (Worker #${WORKER_ID})!\n\nللاشتراك وتفعيل نظامك الفوري (200 دولار)، يرجى التحويل حصراً عبر شبكة:\n🔸 *BNB Smart Chain (BEP20)*\n\nمحفظتنا المعتمدة للاستلاستلام:\n\`${MY_WALLET}\`\n\nبعد الدفع، أرسل رقم المعاملة (TXID) هنا وسيتم التفعيل أوتوماتيكياً!`);
     } else {
       bot.sendMessage(chatId, `🚀 Welcome to AI Growth Platform (Worker #${WORKER_ID})!\n\nTo subscribe ($200), please transfer exclusively via:\n🔸 *BNB Smart Chain (BEP20)*\n\nWallet:\n\`${MY_WALLET}\`\n\nSend your TXID after payment!`);
     }
@@ -164,6 +164,19 @@ const server = http.createServer((req, res) => {
   res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify({ error: 'Endpoint not found' }));
 });
+
+// 8. آلية Keep-Alive (Self-Ping) لمنع السيرفر المجاني من النوم نهائياً كل دقيقتين
+setInterval(() => {
+  const appUrl = process.env.RENDER_EXTERNAL_URL || process.env.KOYEB_PUBLIC_URL || `http://localhost:${PORT}/health`;
+  
+  if (appUrl && !appUrl.includes('localhost')) {
+    http.get(appUrl, (res) => {
+      console.log(`🟢 [Keep-Alive] تم عمل بنج بنجاح للسيرفر (Status: ${res.statusCode})`);
+    }).on('error', (err) => {
+      console.log(`⚠️ [Keep-Alive Note]: ${err.message}`);
+    });
+  }
+}, 120000); // كل دقيقتين (120,000 ميللي ثانية)
 
 server.listen(PORT, () => {
   console.log(`🔥 40k Autonomous Growth Engine (Worker #${WORKER_ID}) running on port ${PORT}`);
